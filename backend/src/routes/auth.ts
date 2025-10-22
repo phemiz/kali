@@ -48,10 +48,12 @@ router.post('/login', async (req: Request, res: Response) => {
 });
 
 function signJwt(userId: string, email: string, fullName: string) {
-  const secret = process.env.JWT_SECRET;
-  const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
-  if (!secret) throw new Error('JWT_SECRET not set');
-  return jwt.sign({ sub: userId, email, full_name: fullName }, secret, { expiresIn });
+  const envSecret = process.env.JWT_SECRET;
+  if (!envSecret) throw new Error('JWT_SECRET not set');
+  const secret: jwt.Secret = envSecret;
+  const expiresInEnv = process.env.JWT_EXPIRES_IN || '7d';
+  const options: jwt.SignOptions = { expiresIn: expiresInEnv as unknown as any };
+  return jwt.sign({ sub: userId, email, full_name: fullName }, secret, options);
 }
 
 export default router;
